@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,7 +31,8 @@ public class SecurityConfiguration {
         CorsConfiguration source = new CorsConfiguration();
 
         source.setAllowedMethods(List.of("*"));
-        source.setAllowedHeaders(List.of("*"));
+        source.setAllowedHeaders(List.of("Content-Type","X-XSRF-TOKEN"));
+        source.setExposedHeaders(List.of("Set-Cookie"));
         source.setAllowedOrigins(List.of("http://localhost:5173"));
         source.setAllowCredentials(true);
 
@@ -43,11 +46,16 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-        httpSecurity.csrf(Customizer.withDefaults()).
+        httpSecurity.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())).
         sessionManagement(session ->
-        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).cors(Customizer.withDefaults())
+        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/api/auth/login").permitAll().anyRequest().authenticated())
+                        request.requestMatchers("/api/auth/login","/api/auth/csrf").permitAll().
+                        requestMatchers("/api/auth/account-information")
+                       .hasAnyRole("ADMIN","MANAGER","TECHNICIAN","RECEPTIONIST").anyRequest().authenticated())
+
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();

@@ -1,0 +1,14 @@
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\dto\RoleDto.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\dto\UserDto.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\entity\Role.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\entity\User.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\FastFixApplication.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\mapper\RoleMapper.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\mapper\UserMapper.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\repository\RoleRepository.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\repository\UserRepository.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\security\BeanConfiguration.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\security\DataInitializer.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\security\JWTService.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\security\PrincipalUser.java
+C:\Users\mkosz\OneDrive\Pulpit\fast-fix\src\main\java\com\fastfix\security\PrincipalUserService.java

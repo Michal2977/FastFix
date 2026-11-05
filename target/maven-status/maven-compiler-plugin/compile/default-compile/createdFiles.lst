@@ -1,0 +1,14 @@
+com\fastfix\security\PrincipalUser.class
+com\fastfix\mapper\RoleMapper.class
+com\fastfix\security\BeanConfiguration.class
+com\fastfix\mapper\UserMapper.class
+com\fastfix\entity\User.class
+com\fastfix\FastFixApplication.class
+com\fastfix\security\DataInitializer.class
+com\fastfix\dto\UserDto.class
+com\fastfix\repository\UserRepository.class
+com\fastfix\repository\RoleRepository.class
+com\fastfix\security\PrincipalUserService.class
+com\fastfix\security\JWTService.class
+com\fastfix\entity\Role.class
+com\fastfix\dto\RoleDto.class
