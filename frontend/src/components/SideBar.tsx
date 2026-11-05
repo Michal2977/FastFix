@@ -1,6 +1,7 @@
+import { Link } from "react-router-dom";
 
 
-function SideBar({}){
+function SideBar({logout,user} : any){
     return(
          <div className="d-flex">
   <nav className="bg-dark text-white vh-100 p-3" style={{ width: "250px" }}>
@@ -17,9 +18,7 @@ function SideBar({}){
       <div className="collapse navbar-collapse show w-100" id="navbarSupportedContent">
         <ul className="nav flex-column w-100">
           <li className="nav-item">
-            <a className="nav-link active" aria-current="page" href="#">
-              Home
-            </a>
+            <Link to={"/account-information"}>Account Information</Link>
           </li>
 
           <li className="nav-item">
@@ -33,8 +32,8 @@ function SideBar({}){
               Dropdown
             </a>
             <ul className="dropdown-menu">
-              <li><a className="dropdown-item" href="#">Action</a></li>
-              <li><a className="dropdown-item" href="#">Another action</a></li>
+              <li><button className="btn btn-danger" type="button" onClick={logout}>Logout</button></li>
+              <li><h1>{user?.firstName}</h1></li>
               <li><a className="dropdown-item" href="#">Something else here</a></li>
             </ul>
           </li>

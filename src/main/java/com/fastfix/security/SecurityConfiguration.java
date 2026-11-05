@@ -52,7 +52,7 @@ public class SecurityConfiguration {
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/api/auth/login","/api/auth/csrf").permitAll().
+                        request.requestMatchers("/api/auth/login","/api/auth/csrf","/api/auth/logout").permitAll().
                         requestMatchers("/api/auth/account-information")
                        .hasAnyRole("ADMIN","MANAGER","TECHNICIAN","RECEPTIONIST").anyRequest().authenticated())
 

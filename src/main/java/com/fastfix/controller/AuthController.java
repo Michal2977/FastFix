@@ -6,6 +6,8 @@ import com.fastfix.response.ApiResponse;
 import com.fastfix.response.JWTResponse;
 import com.fastfix.security.JWTService;
 import com.fastfix.service.Impl.AuthServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -50,6 +52,15 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("token", token).httpOnly(true).secure(false)
                 .sameSite("LAX").path("/").maxAge(Duration.ofHours(24)).build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,cookie.toString()).build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response){
+        ResponseCookie cookie = ResponseCookie.from("token", "").httpOnly(true)
+                .secure(false).path("/").sameSite("LAX").maxAge(0).build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE,cookie.toString());
+        return ResponseEntity.ok().body(new ApiResponse("Logged out successfully"));
     }
 
 

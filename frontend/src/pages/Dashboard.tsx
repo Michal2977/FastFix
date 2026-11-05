@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import SideBar from "../components/SideBar";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config";
 
 function Dashboard(){
 
      const [user, setUser] = useState<any>(null);
     const navigate = useNavigate();
     const [inncorectMessage,setIncorrectMessage] = useState("");
+    const [correctMessage,setCorrectMessage] = useState("");
     const [loading ,setLoading] = useState(true);
 
     useEffect(() => {
     const getUser = async() => {
         try{
-            const response = await fetch("http://localhost:8080/api/auth/account-information",{
+           
+
+            const response = await fetch(`${API_URL}/api/auth/account-information`,{
                 credentials : "include"
             });
             if(response.status === 401){
@@ -30,12 +34,47 @@ function Dashboard(){
     };
        getUser();
     },[navigate])
+
+
+    const logout = async() => {
+        try{
+            const csrfResponse = await fetch(`${API_URL}/api/auth/csrf`,{
+                credentials : "include"
+            });
+
+            if(!csrfResponse.ok){
+                return;
+            }
+
+            const cookie = document.cookie.split("; ").find(row => row.startsWith("XSRF-TOKEN="));
+
+            if(!cookie){
+                return;
+            }
+
+            const csrfToken = decodeURIComponent(cookie.substring("XSRF-TOKEN=".length));
+
+            const response = await fetch(`${API_URL}/api/auth/logout`,{
+                method : "POST",
+                credentials : "include",
+                headers : {"X-XSRF-TOKEN" : csrfToken}
+            });
+
+            if(response.ok){
+                const text = await response.json();
+                navigate("/login",{state: {message: text.message}});
+            }
+        }catch(error){
+            console.log(error);
+        }
+    }
+
    return (
     <>
-        {loading ? null : user ? (
+        {loading ? <p>Loading......</p> : user ?  (
             <div>
-            <SideBar />
-            <h1>{user.firstName}</h1>
+            <SideBar logout = {logout} user= {user}/>
+           
             </div>
         ) : (
         <>
