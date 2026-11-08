@@ -13,4 +13,7 @@ public interface UserRepository  extends JpaRepository<User,Long> {
     User findByEmail(@Param("email")String email);
 
     long countByRole_Role(String role);
+
+    @Query("Select u From User u Where u.verificationCode = ?1")
+    User findByVerificationCode(@Param("code")String code);
 }

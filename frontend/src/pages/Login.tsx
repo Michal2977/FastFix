@@ -12,6 +12,11 @@ function Login(){
     const [password,setPassword] = useState("");
     const location = useLocation();
 
+
+
+
+
+  
 useEffect(() => {
     if (location.state?.message) {
         setCorrectMessage(location.state.message);

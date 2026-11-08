@@ -52,8 +52,9 @@ public class SecurityConfiguration {
         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/api/auth/login","/api/auth/csrf","/api/auth/logout").permitAll().
-                        requestMatchers("/api/auth/account-information")
+                        request.requestMatchers("/api/auth/login","/api/auth/csrf","/api/auth/logout"
+                                ,"/api/auth/verify").permitAll().
+                        requestMatchers("/api/auth/account-information","/api/auth/account-information/update")
                        .hasAnyRole("ADMIN","MANAGER","TECHNICIAN","RECEPTIONIST").anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

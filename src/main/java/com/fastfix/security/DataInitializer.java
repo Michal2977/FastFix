@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Component
@@ -48,7 +49,7 @@ public class DataInitializer implements CommandLineRunner {
             Role role = roleRepository.findByRole("ADMIN");
             User admin = new User();
             admin.setRole(Set.of(role));
-
+            admin.setCreateAt(LocalDateTime.now());
             admin.setFirstName(firstName);
             admin.setLastName(lastName);
             admin.setPassword(passwordEncoder.encode(password));
