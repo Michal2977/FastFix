@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 
-function SideBar({logout,user} : any){
+function SideBar({logout,user,admin} : any){
     return(
          <div className="d-flex">
   <nav className="bg-dark text-white vh-100 p-3" style={{ width: "250px" }}>
@@ -20,12 +20,14 @@ function SideBar({logout,user} : any){
           <li className="nav-item">
             <Link to={"/account-information"}>Account Information</Link>
           </li>
-
-          <li className="nav-item">
-            <a className="nav-link text-white" href="#">
-              Link
-            </a>
+          {admin && (
+            <div>
+             <li className="nav-item">
+           <Link to={"/create-employee"}>CreateEmployee</Link>
           </li>
+            </div>
+          )}
+         
 
           <li className="nav-item dropdown">
             <a className="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

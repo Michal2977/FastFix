@@ -39,6 +39,9 @@ public class User {
     @Column(name = "verification_code")
     private String verificationCode;
 
+    @Column(name = "verification_token")
+    private String verificationToken;
+
     @Column(name = "create_at")
     private LocalDateTime createAt;
 
@@ -55,13 +58,15 @@ public class User {
     }
 
     public User(String firstName, String lastName, String email, String password, String alternativeEmail,
-                String verificationCode, LocalDateTime createAt, LocalDateTime expiresAt, Set<Role> role) {
+                String verificationCode, String verificationToken, LocalDateTime createAt, LocalDateTime expiresAt,
+                Set<Role> role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.alternativeEmail = alternativeEmail;
         this.verificationCode = verificationCode;
+        this.verificationToken = verificationToken;
         this.createAt = createAt;
         this.expiresAt = expiresAt;
         this.role = role;

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { API_URL } from "../../config";
 
 
@@ -24,10 +24,9 @@ useEffect(() => {
             replace: true,
             state: null
         });
-       const timer = setTimeout(() => {
+      setTimeout(() => {
             setCorrectMessage("");
         }, 3000);
-        return () => clearTimeout(timer);
     }
 }, [location.state, navigate]);
 
@@ -45,12 +44,14 @@ useEffect(() => {
    useEffect(() => {
     if(!correctMessage){return;}
 
-    const timer = setTimeout(() => {
+ setTimeout(() => {
         setCorrectMessage("");
     },3000);
    })
 
-    const login = async () => {
+     
+    const login = async(e : React.SyntheticEvent<HTMLFormElement>) => {
+        e.preventDefault();
     try {
         const csrfResponse = await fetch(
             `${API_URL}/api/auth/csrf`,
@@ -58,8 +59,12 @@ useEffect(() => {
                 credentials: "include"
             }
         );
+        
         if (!csrfResponse.ok) {
-             setIncorrectMessage("An error occurred during login");
+             setIncorrectMessage("An error occurred during loginasda");
+             setTimeout(() => {
+             setIncorrectMessage("");
+             },3000);
              return;
         }
 
@@ -67,6 +72,9 @@ useEffect(() => {
 
         if (!cookie) {
             setIncorrectMessage("An error occurred during login");
+            setTimeout(() => {
+                setIncorrectMessage("");
+            },3000);
             return;
         }
         const csrfToken = decodeURIComponent(
@@ -91,18 +99,18 @@ useEffect(() => {
         }else{
              const text = await response.json();
               setIncorrectMessage(text.message);
-           const timer =  setTimeout(() => {
+            setTimeout(() => {
             setIncorrectMessage("");
             },3000);
            
-            return () => clearTimeout(timer);
+          
         }
     } catch (error) {
         setIncorrectMessage("An error occurred during login");
-       const timer =  setTimeout(() => {
+        setTimeout(() => {
            setIncorrectMessage("");
         },3000);
-        return () => clearTimeout(timer);
+       
     }
 };
 
@@ -114,12 +122,15 @@ useEffect(() => {
             {correctMessage && (
                 <h1>{correctMessage}</h1>
             )} 
-        <form onSubmit={(e) => {e.preventDefault(); login();}}>  
+        <form onSubmit={login}>  
          <input type="email" placeholder="email" value={email}  onChange={(e) => setEmail(e.target.value)} required/>
          <br/>
          <input type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
          <br/>
-         <button type="submit">Sign In</button>
+         <button type="submit" className="btn btn-success">Sign In</button>
+         <br/>
+         <Link to={"/resend-email"}>Resend Email</Link>
+         <Link to={"/forgot-password"}>Forgot Passowrd?</Link>
          </form>
         </div>
       

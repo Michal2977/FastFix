@@ -41,10 +41,31 @@ public class EmailServiceImpl implements EmailService {
         String htmlContent = templateEngine.process("email/user_change_email.html",context);
 
         helper.setSubject("Account Verification");
-        helper.setTo(user.getEmail());
+        helper.setTo(user.getAlternativeEmail());
         helper.setFrom("mkoszalka0@gmail.com");
         helper.setText(htmlContent,true);
 
+
+        javaMailSender.send(message);
+    }
+
+    @Override
+    @Async
+    public void sendForgotPasswordEmail(User user,String siteUrl) throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message,true);
+
+        String verifyUrl = siteUrl + "/api/auth/reset-password?token=" + user.getVerificationToken();
+
+        Context context = new Context();
+        context.setVariable("verify",verifyUrl);
+
+        String htmlContent = templateEngine.process("email/reset_password_email.html",context);
+
+        helper.setFrom("mkoszalka0@gmail.com");
+        helper.setTo(user.getEmail());
+        helper.setSubject("Reset Password");
+        helper.setText(htmlContent,true);
 
         javaMailSender.send(message);
     }

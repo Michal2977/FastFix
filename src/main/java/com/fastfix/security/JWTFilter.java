@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -43,21 +44,31 @@ public class JWTFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
             return;
         }
+        try{
+            String email = jwtService.extractEmail(token);
 
-       String email = jwtService.extractEmail(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
+                    (userDetails,null,userDetails.getAuthorities());
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
-                (userDetails,null,userDetails.getAuthorities());
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        }catch (UsernameNotFoundException e){
+            SecurityContextHolder.clearContext();
 
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            Cookie cookie = new Cookie("token",null);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setPath("/");
+            cookie.setMaxAge(0);
+
+            response.addCookie(cookie);
+        }
+
+
 
         filterChain.doFilter(request,response);
     }
 }
-
-
-

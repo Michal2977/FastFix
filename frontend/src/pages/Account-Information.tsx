@@ -9,6 +9,7 @@ function AccountInfomation(){
    const [user,setUser] = useState<any>(null);
    const navigate = useNavigate();
    const [loading,setLoading] = useState(true);
+   const [newPassword,setNewPassowrd] = useState("");
    const [coorectMessage,setCorrectMessage] = useState("");
    const [inCorrectMessage,setInCorrectMessage] = useState("");
    
@@ -49,7 +50,7 @@ function AccountInfomation(){
             headers : {"Content-Type" : "application/json",
                 "X-XSRF-TOKEN" : csrfToken ?? ""
             },
-            body  : JSON.stringify(user)
+            body  : JSON.stringify({...user,password : newPassword.trim() || null})
         });
 
         if(response.status === 401){
@@ -85,17 +86,18 @@ function AccountInfomation(){
              {inCorrectMessage && (
                 <h1>{inCorrectMessage}</h1>
             )}
-            <form onSubmit={updateUserAccountData}>
+            <form onSubmit={updateUserAccountData} autoComplete="off">
                 <input type="text" placeholder="firstName" value={user?.firstName}
                 onChange={(e) => setUser({...user,firstName : e.target.value})}/>
                 <br/>
                 <input type="text" placeholder="lastName" value={user?.lastName}
                 onChange={(e) => setUser({...user,lastName : e.target.value})}/>
                <br/>
-                <input type="email" placeholder="email"   value={user?.email}
+                <input type="email" placeholder="email"  autoComplete="off" value={user?.email}
                 onChange={(e) => setUser({...user,email : e.target.value})}/>
                 <br/>
-                <input type="password"  placeholder="password" onChange={(e) => setUser({...user,password : e.target.value})}/>
+                <input type="password"  placeholder="password"  autoComplete="new-password" value={newPassword}
+                 onChange={(e) => setNewPassowrd(e.target.value)}/>
                 <br/>
                 <button type="submit" className="btn btn-success" >Update</button>
             </form>
@@ -110,7 +112,7 @@ function AccountInfomation(){
    )
 
 }
-
+ 
 
 
 export default AccountInfomation;

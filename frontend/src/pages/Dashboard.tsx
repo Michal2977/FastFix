@@ -68,12 +68,15 @@ function Dashboard(){
             console.log(error);
         }
     }
+         
+    const admin = user?.roleDto?.some((role: {role :String}) => role.role === "ADMIN");
+
 
    return (
     <>
         {loading ? <p>Loading......</p> : user ?  (
             <div>
-            <SideBar logout = {logout} user= {user}/>
+            <SideBar logout = {logout} user= {user} admin={admin}/>
            
             </div>
         ) : (

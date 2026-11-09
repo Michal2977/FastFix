@@ -5,6 +5,7 @@ import com.fastfix.entity.User;
 import com.fastfix.exception.EmailUpdateException;
 import com.fastfix.exception.UserUpdateConflictException;
 import com.fastfix.request.ChangeAccountDataRequest;
+import com.fastfix.request.CreateNewEmployeeRequest;
 import com.fastfix.request.LoginRequest;
 import com.fastfix.response.ApiResponse;
 import com.fastfix.response.JWTResponse;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -101,15 +103,87 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyAccount(@RequestParam("code")String code){
+    public ResponseEntity<?> verifyAccount(@RequestParam("code")String code,HttpServletResponse response){
         boolean verify = authService.emailVerification(code);
         if (verify == false){
             return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendUrl + "/verify-failed"))
                     .build();
         }else {
+            ResponseCookie cookie = ResponseCookie.from("token", "").httpOnly(true)
+                    .secure(false).path("/").maxAge(0).sameSite("Lax").build();
+            response.addHeader(HttpHeaders.SET_COOKIE,cookie.toString());
             return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendUrl + "/login")).build();
         }
     }
 
+    @PostMapping("/create-employee")
+    public ResponseEntity<?> createNewEmployee(@RequestBody CreateNewEmployeeRequest request){
+      try {
+          authService.createNewEmployee(request);
+          return ResponseEntity.ok().body(new ApiResponse("An employee with the specified role has been created"));
+      }catch (UserUpdateConflictException e){
+          return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
+      }
+    }
 
+    @PostMapping("/resend")
+    public ResponseEntity<?> resendEmailActivation(@RequestParam("email")String email,HttpServletRequest request) throws MessagingException {
+        try {
+            String siteUrl = Utility.servletRequest(request);
+            authService.resendEmailActivation(email,siteUrl);
+            return ResponseEntity.ok().body(new ApiResponse("If an account exists and has not " +
+                    "been activated, a verification email has been sent"));
+        }catch (UserUpdateConflictException e){
+            return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().body(new ApiResponse("Something Went Wrong Try again Later"));
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> sendForgotPasswordEmail(@RequestParam("email")String email,HttpServletRequest request){
+
+        try {
+            String siteUrl = Utility.servletRequest(request);
+            authService.sendResetPasswordToken(email,siteUrl);
+            return ResponseEntity.ok().body(new ApiResponse("If an account exists and has not been" +
+            "activated, a verification email has been sent"));
+        }catch (UserUpdateConflictException e){
+            return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
+        }
+        catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new ApiResponse("Something Went Wrong Try again Later"));
+        }
+    }
+
+    @GetMapping("/reset-password")
+    public ResponseEntity<?> resetPasswordCheck(@RequestParam("token")String token){
+        User user = authService.findByPasswordToken(token);
+
+        if (user == null || user.getExpiresAt().isBefore(LocalDateTime.now())){
+            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendUrl + "/verify-failed"))
+                    .build();
+        }else {
+            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendUrl + "/reset-password?token="
+                    + token)).build();
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPasswordSubmit(@RequestParam("token")String token
+            ,@RequestParam("password")String password){
+      User user = authService.findByPasswordToken(token);
+      if (user == null || user.getExpiresAt().isBefore(LocalDateTime.now())){
+          return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontendUrl + "/verify-failed"))
+                  .build();
+      }
+      try {
+          authService.resetPassword(password,user);
+          return ResponseEntity.ok().body(new ApiResponse("Password Changed Correctly"));
+      }catch (UserUpdateConflictException e){
+          return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
+      }catch (Exception e){
+          return ResponseEntity.internalServerError().body(new ApiResponse("Something Went Wrong Try again Later"));
+      }
+    }
 }

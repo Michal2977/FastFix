@@ -53,7 +53,8 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/api/auth/login","/api/auth/csrf","/api/auth/logout"
-                                ,"/api/auth/verify").permitAll().
+                                ,"/api/auth/verify","/api/auth/resend","/api/auth/forgot-password","/api/auth/reset-password").permitAll().
+                        requestMatchers("/api/auth/create-employee").hasRole("ADMIN").
                         requestMatchers("/api/auth/account-information","/api/auth/account-information/update")
                        .hasAnyRole("ADMIN","MANAGER","TECHNICIAN","RECEPTIONIST").anyRequest().authenticated())
 
