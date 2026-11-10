@@ -14,15 +14,17 @@ public class UserDto {
     private String lastName;
     private String email;
     private Set<RoleDto> roleDto;
+    private String picture;
 
     public UserDto() {
     }
 
-    public UserDto(Long id, String firstName, String lastName, String email, Set<RoleDto> roleDto) {
+    public UserDto(Long id, String firstName, String lastName, String email, Set<RoleDto> roleDto,String picture) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.roleDto = roleDto;
+        this.picture = picture;
     }
 }

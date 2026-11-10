@@ -1,6 +1,7 @@
 import type React from "react";
 import { API_URL } from "../../config";
 import { useState } from "react";
+import { Turnstile, useTurnstile } from "react-turnstile";
 
 
 
@@ -9,10 +10,19 @@ function ForgotPassword(){
     const [failedMessage,setFailedMessage] = useState("");
     const [successMessage,setSuccessMessage] = useState("");
     const [email,setEmail] = useState("");
+    const [turnstileToken,setTurnstileToken] = useState("");
+    const turnstile = useTurnstile();
 
     const sendEmail = async(e : React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
        
+        if(!turnstileToken){
+            setFailedMessage("Complete the Turnstile verification.");
+            setTimeout(() => {
+                setFailedMessage("");
+            },3000);
+            return;
+        }
         try{
             const csrfResponse = await fetch(`${API_URL}/api/auth/csrf`,{
                 credentials : "include"
@@ -38,7 +48,8 @@ function ForgotPassword(){
 
             const csrfToken = decodeURIComponent(cookie.substring("XSRF-TOKEN=".length));
 
-            const response = await fetch(`${API_URL}/api/auth/forgot-password?email=${encodeURIComponent(email)}`,{
+            const response = await fetch(`${API_URL}/api/auth/forgot-password?email=${encodeURIComponent(email)}
+            &turnstileToken=${encodeURIComponent(turnstileToken)}`,{
                 credentials : "include",
                 method : "POST",
                 headers : {"X-XSRF-TOKEN" : csrfToken ?? ""}
@@ -47,14 +58,18 @@ function ForgotPassword(){
             const text = await response.json();
             if(response.ok){
               setSuccessMessage(text.message);
+              setEmail("");
+              setTurnstileToken("");
               setTimeout(() => {
                 setSuccessMessage("");
               },3000);
             }else{
               setFailedMessage(text.message);
+              setTurnstileToken("");
               setTimeout(() => {
                 setFailedMessage("");
               },3000);
+              turnstile.reset();
             }
         }catch(error){
             console.log(error);
@@ -74,6 +89,7 @@ function ForgotPassword(){
              <input type="email" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
              <br/>
              <button type="submit" className="btn btn-success">Send </button>
+             <Turnstile sitekey="0x4AAAAAADsdFGr1bVY65jeD" onSuccess={(token) => {setTurnstileToken(token);setFailedMessage("");}}/>
             </form>
 
         </div>

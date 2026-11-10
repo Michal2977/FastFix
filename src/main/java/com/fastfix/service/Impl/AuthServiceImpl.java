@@ -4,36 +4,55 @@ import com.fastfix.dto.UserDto;
 import com.fastfix.entity.Role;
 import com.fastfix.entity.User;
 import com.fastfix.exception.EmailUpdateException;
+import com.fastfix.exception.InvalidFileException;
 import com.fastfix.exception.UserUpdateConflictException;
 import com.fastfix.mapper.UserMapper;
 import com.fastfix.repository.RoleRepository;
 import com.fastfix.repository.UserRepository;
 import com.fastfix.request.ChangeAccountDataRequest;
 import com.fastfix.request.CreateNewEmployeeRequest;
+import com.fastfix.response.TurnStileResponse;
 import com.fastfix.service.AuthService;
 import jakarta.mail.MessagingException;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Random;
+import java.util.Objects;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    @Value("${turnstile.verify-url}")
+    private String turnstileUrl;
+
+    @Value("${turnstile.secret-key}")
+    private String turnstileSecret;
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailServiceImpl emailService;
     private final RoleRepository roleRepository;
+    private final RestTemplate restTemplate;
 
-    public AuthServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, EmailServiceImpl emailService, RoleRepository roleRepository) {
+    public AuthServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, EmailServiceImpl emailService, RoleRepository roleRepository, RestTemplate restTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
         this.roleRepository = roleRepository;
+        this.restTemplate = restTemplate;
     }
 
 
@@ -54,10 +73,34 @@ public class AuthServiceImpl implements AuthService {
         return UserMapper.userDto(user);
     }
 
+    @Override
+    public boolean verifyTurnstile(String token){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String ,String> map = new LinkedMultiValueMap<>();
+
+        map.add("secret",turnstileSecret);
+        map.add("response",token);
+
+        HttpEntity<MultiValueMap<String ,String>> request = new HttpEntity<>(map,headers);
+        TurnStileResponse response = restTemplate.postForObject(turnstileUrl,request, TurnStileResponse.class);
+
+        System.out.println("success" + response.isSuccess());
+        System.out.println("hostName" + response.getHostName());
+        System.out.println("challenge timeStamp" + response.getChallenge_ts());
+
+        if (response.getError_codes() != null){
+            for (String error : response.getError_codes()){
+                System.out.println(error);
+            }
+        }
+        return response.isSuccess();
+    }
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN','MANAGER','TECHNICIAN','RECEPTIONIST')")
-    public UserDto changeAccountData(String email, ChangeAccountDataRequest request,String siteUrl) throws MessagingException {
+    public UserDto changeAccountData(String email, ChangeAccountDataRequest request,
+                                     String siteUrl,MultipartFile file) throws MessagingException, IOException {
 
         User user = userRepository.findByEmail(email);
 
@@ -84,6 +127,22 @@ public class AuthServiceImpl implements AuthService {
         if (request.getPassword() != null && !request.getPassword().isBlank()){
          user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
+        if (file != null && !file.isEmpty()){
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+
+            if (fileName.contains("..")){
+                throw new InvalidFileException("Invalid file name");
+            }
+            String contentType = file.getContentType();
+            if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png")
+            || contentType.equals("image/webp"))){
+                throw new InvalidFileException("Only image files are allowed");
+            }
+            if (file.getSize() > 8 *1024 * 1024){
+                throw new InvalidFileException("Maximum file size is 8 MB");
+            }
+            user.setPicture(file.getBytes());
+        }
 
         userRepository.save(user);
         return UserMapper.userDto(user);
@@ -104,10 +163,9 @@ public class AuthServiceImpl implements AuthService {
 
         }
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public UserDto createNewEmployee(CreateNewEmployeeRequest request){
+    public UserDto createNewEmployee(CreateNewEmployeeRequest request, MultipartFile file) throws IOException {
 
         User user = new User();
         Role role = roleRepository.findByRole(request.getRole().iterator().next());
@@ -122,6 +180,24 @@ public class AuthServiceImpl implements AuthService {
         }
         user.setEmail(request.getEmail());
         user.setCreateAt(LocalDateTime.now());
+
+        if (file != null &&  !file.isEmpty()){
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+
+            if (fileName.contains("..")){
+                throw new InvalidFileException("Invalid file name");
+            }
+
+            String contentType  = file.getContentType();
+            if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png") ||
+                    contentType.equals("image/webp"))){
+                throw new InvalidFileException("Only image files are allowed");
+            }
+            if (file.getSize() > 8 * 1024 * 1024){
+                throw new InvalidFileException("Maximum file size is 8 MB");
+            }
+            user.setPicture(file.getBytes());
+        }
 
         userRepository.save(user);
         return UserMapper.userDto(user);

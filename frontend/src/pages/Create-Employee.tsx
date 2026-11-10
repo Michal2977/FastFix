@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { API_URL } from "../../config";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +9,8 @@ function CreateEmplyee(){
     const [successMessage,setSuccessMessage] = useState("");
     const [failedMessage,setFialedMessage] = useState("");
     const navigate = useNavigate();
+    const [file,setFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
 
 
@@ -20,14 +22,33 @@ function CreateEmplyee(){
     const createEmployee = async(e : React.SyntheticEvent<HTMLFormElement>) => {
      e.preventDefault();
      try{
+
+        const request = {
+            ...newEmployee,
+            firstName : newEmployee.firstName,
+            lastName : newEmployee.lastName,
+            email : newEmployee.email,
+            password : newEmployee.password,
+            role : [newEmployee.role],
+        };
+
+        const formData = new FormData();
+
+        formData.append("request", new Blob([
+            JSON.stringify(request)
+        ],{type : "application/json"}));
+
+        if(file){
+            formData.append("file",file);
+        }
         const csrfToken = getCsrfToken();
         const response = await fetch(`${API_URL}/api/auth/create-employee`,{
             method : "POST",
             credentials : "include",
-            headers : {"Content-Type" : "application/json",
+            headers : {
                 "X-XSRF-TOKEN" : csrfToken ?? ""
             },
-            body : JSON.stringify({...newEmployee, role: [newEmployee.role]})
+            body : formData
         });
 
         if(response.status === 401){
@@ -38,8 +59,20 @@ function CreateEmplyee(){
         if(response.ok){
             setSuccessMessage(text.message);
              setTimeout(() => {
+                setNewEmployee({
+                firstName : "",
+                lastName : "",
+                email : "",
+                password : "",
+                role : []
+
+                })
                 setSuccessMessage("");
             },3000);
+            if(fileInputRef.current){
+              fileInputRef.current.value = "";
+            }
+            setFile(null);
         }else{
             setFialedMessage(text.message);
             setTimeout(() => {
@@ -87,6 +120,13 @@ function CreateEmplyee(){
           <input type="password" placeholder="password" value={newEmployee.password} required
           onChange={(e) => setNewEmployee({...newEmployee,password : e.target.value})}/>
 
+          <br/>
+           <input type="file"  accept="image/jpeg,image/png,image/webp" onChange={(e : React.ChangeEvent<HTMLInputElement>) => {
+            setFile(e.target.files?.[0] ?? null);
+           }}   ref={fileInputRef}/>
+           {file && (
+            <img src={URL.createObjectURL(file)} alt="no Image" width={"200px"} height={"200px"}/>
+           )}
           <br/>
           <button type="submit" className="btn btn-success">Create</button>
           </form>

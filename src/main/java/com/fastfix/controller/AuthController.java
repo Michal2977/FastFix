@@ -3,6 +3,7 @@ package com.fastfix.controller;
 import com.fastfix.Util.Utility;
 import com.fastfix.entity.User;
 import com.fastfix.exception.EmailUpdateException;
+import com.fastfix.exception.InvalidFileException;
 import com.fastfix.exception.UserUpdateConflictException;
 import com.fastfix.request.ChangeAccountDataRequest;
 import com.fastfix.request.CreateNewEmployeeRequest;
@@ -23,7 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -85,14 +88,18 @@ public class AuthController {
 
     @PutMapping("/account-information/update")
     public ResponseEntity<?> updateUserAccountData(Authentication authentication, HttpServletRequest request,
-                                                   @RequestBody ChangeAccountDataRequest changeRequest){
+                                                   @Valid @RequestPart("request") ChangeAccountDataRequest changeRequest
+    ,@RequestPart(value = "file",required = false)MultipartFile file){
 
         User user = authService.findByEmail(authentication.getName());
         try {
             String siteUrl = Utility.servletRequest(request);
-            authService.changeAccountData(user.getEmail(),changeRequest,siteUrl);
+            authService.changeAccountData(user.getEmail(),changeRequest,siteUrl,file);
             return ResponseEntity.ok().body(new ApiResponse("Account Data Updated Correctly"));
-        } catch (EmailUpdateException e){
+        }catch (InvalidFileException e){
+            return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
+        }
+        catch (EmailUpdateException e){
             return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
         } catch (UserUpdateConflictException e){
             return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
@@ -117,18 +124,28 @@ public class AuthController {
     }
 
     @PostMapping("/create-employee")
-    public ResponseEntity<?> createNewEmployee(@RequestBody CreateNewEmployeeRequest request){
+    public ResponseEntity<?> createNewEmployee(@Valid @RequestPart("request") CreateNewEmployeeRequest request,
+                                               @RequestPart(value = "file",required = false)MultipartFile file){
       try {
-          authService.createNewEmployee(request);
+          authService.createNewEmployee(request,file);
           return ResponseEntity.ok().body(new ApiResponse("An employee with the specified role has been created"));
       }catch (UserUpdateConflictException e){
           return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
+      }catch (InvalidFileException e){
+          return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
+      }
+      catch (Exception e) {
+          return ResponseEntity.internalServerError().body(new ApiResponse("Something Went Wrong Try again Later"));
       }
     }
 
     @PostMapping("/resend")
-    public ResponseEntity<?> resendEmailActivation(@RequestParam("email")String email,HttpServletRequest request) throws MessagingException {
+    public ResponseEntity<?> resendEmailActivation(@RequestParam("email")String email,
+            @RequestParam("turnstileToken")String turnStileToken,HttpServletRequest request) throws MessagingException {
         try {
+            if (!authService.verifyTurnstile(turnStileToken)){
+                return ResponseEntity.badRequest().body(new ApiResponse("Turnstile verification failed"));
+            }
             String siteUrl = Utility.servletRequest(request);
             authService.resendEmailActivation(email,siteUrl);
             return ResponseEntity.ok().body(new ApiResponse("If an account exists and has not " +
@@ -141,9 +158,13 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> sendForgotPasswordEmail(@RequestParam("email")String email,HttpServletRequest request){
+    public ResponseEntity<?> sendForgotPasswordEmail(@RequestParam("email")String email
+         ,@RequestParam("turnstileToken")String turnstileToken, HttpServletRequest request){
 
         try {
+            if (!authService.verifyTurnstile(turnstileToken)){
+                return ResponseEntity.badRequest().body(new ApiResponse("Turnstile verification failed"));
+            }
             String siteUrl = Utility.servletRequest(request);
             authService.sendResetPasswordToken(email,siteUrl);
             return ResponseEntity.ok().body(new ApiResponse("If an account exists and has not been" +

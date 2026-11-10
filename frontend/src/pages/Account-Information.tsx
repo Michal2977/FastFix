@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { API_URL } from "../../config";
 import { useNavigate } from "react-router-dom";
 
@@ -12,6 +12,8 @@ function AccountInfomation(){
    const [newPassword,setNewPassowrd] = useState("");
    const [coorectMessage,setCorrectMessage] = useState("");
    const [inCorrectMessage,setInCorrectMessage] = useState("");
+   const [file,setFile] = useState<File | null>(null);
+   const fileInputRef = useRef<HTMLInputElement>(null);
    
     const getCsrfToken = () => {
     return document.cookie.split("; ").find(row => row.startsWith("XSRF-TOKEN="))?.split("=")[1];
@@ -43,14 +45,27 @@ function AccountInfomation(){
     e.preventDefault();
     try{
     
+        const request = {
+            ...user,
+            password : newPassword.trim() || null
+        };
+
+        const formData = new FormData();
+
+        formData.append("request",new Blob([
+            JSON.stringify(request)
+        ],{type : "application/json"}));
+
+        if(file){
+            formData.append("file",file);
+        }
         const csrfToken = getCsrfToken();
         const response = await fetch(`${API_URL}/api/auth/account-information/update`,{
             method : "PUT",
             credentials : "include",
-            headers : {"Content-Type" : "application/json",
-                "X-XSRF-TOKEN" : csrfToken ?? ""
+            headers : {"X-XSRF-TOKEN" : csrfToken ?? ""
             },
-            body  : JSON.stringify({...user,password : newPassword.trim() || null})
+            body  : formData
         });
 
         if(response.status === 401){
@@ -64,7 +79,12 @@ function AccountInfomation(){
          setCorrectMessage(data.message);
          setTimeout(() => {
             setCorrectMessage("");
+            window.location.reload();
          },3000);
+         if(fileInputRef.current){
+            fileInputRef.current.value = "";
+            setFile(null);
+         }
         }else{
             setInCorrectMessage(data.message);
             setTimeout(() => {
@@ -98,6 +118,18 @@ function AccountInfomation(){
                 <br/>
                 <input type="password"  placeholder="password"  autoComplete="new-password" value={newPassword}
                  onChange={(e) => setNewPassowrd(e.target.value)}/>
+                 <br/>
+                 {user?.picture && (
+                <img src={`data:${user.pictureContentType};base64,${user.picture}`} width={"200px"} height={"200px"}/>
+                 )}
+               
+                <br/>
+                <input type="file" accept="image/jpeg,image/png,image/webp" 
+                onChange={(e : React.ChangeEvent<HTMLInputElement>) => {setFile(e.target.files?.[0] ?? null)}} ref={fileInputRef}/>
+                <br/>
+                {file && (
+                    <img src={URL.createObjectURL(file)} alt="no Image" width={"200px"} height={"200px"}/>
+                )}
                 <br/>
                 <button type="submit" className="btn btn-success" >Update</button>
             </form>

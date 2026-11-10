@@ -31,7 +31,8 @@ public class User {
     @Column(name = "password",nullable = false)
     private String password;
 
-
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] picture;
 
     @Column(name = "alternative_email")
     private String alternativeEmail;
@@ -57,13 +58,14 @@ public class User {
     public User() {
     }
 
-    public User(String firstName, String lastName, String email, String password, String alternativeEmail,
-                String verificationCode, String verificationToken, LocalDateTime createAt, LocalDateTime expiresAt,
-                Set<Role> role) {
+    public User(String firstName, String lastName, String email, String password, byte[] picture,
+                String alternativeEmail, String verificationCode, String verificationToken, LocalDateTime createAt,
+                LocalDateTime expiresAt, Set<Role> role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.picture = picture;
         this.alternativeEmail = alternativeEmail;
         this.verificationCode = verificationCode;
         this.verificationToken = verificationToken;
