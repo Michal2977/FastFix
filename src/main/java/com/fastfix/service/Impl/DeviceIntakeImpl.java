@@ -3,29 +3,39 @@ package com.fastfix.service.Impl;
 import com.fastfix.dto.DeviceIntakeDto;
 import com.fastfix.entity.*;
 import com.fastfix.enums.DeviceStatus;
+import com.fastfix.mapper.DeviceIntakeMapper;
+import com.fastfix.repository.CustomerRepository;
 import com.fastfix.repository.DeviceIntakeRepository;
 import com.fastfix.request.RegisterAnOrderRequest;
-import com.fastfix.service.AuthService;
 import com.fastfix.service.DeviceIntakeService;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.stream.Collectors;
+
 
 @Service
 public class DeviceIntakeImpl implements DeviceIntakeService {
 
     private final AuthServiceImpl authService;
     private final DeviceIntakeRepository deviceIntakeRepository;
+    private final CustomerRepository customerRepository;
+    private final EmailServiceImpl emailService;
 
-    public DeviceIntakeImpl(AuthServiceImpl authService, DeviceIntakeRepository deviceIntakeRepository) {
+    public DeviceIntakeImpl(AuthServiceImpl authService, DeviceIntakeRepository deviceIntakeRepository, CustomerRepository customerRepository, EmailServiceImpl emailService) {
         this.authService = authService;
         this.deviceIntakeRepository = deviceIntakeRepository;
+
+        this.customerRepository = customerRepository;
+        this.emailService = emailService;
     }
 
     @Transactional
-    public DeviceIntakeDto registerAnOrder(String email, RegisterAnOrderRequest request){
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST','MANAGER')")
+    public DeviceIntakeDto registerAnOrder(String email, RegisterAnOrderRequest request,String siteUrl) throws MessagingException {
 
         User user = authService.findByEmail(email);
 
@@ -44,19 +54,25 @@ public class DeviceIntakeImpl implements DeviceIntakeService {
         deviceIntake.getDevice().add(device);
 
         Customer customer = new Customer();
+        customer.setCustomerEmail(request.getCustomerEmail());
+        customer.setCustomerPhoneNumber(request.getCustomerPhoneNumber());
+        customer.setCustomerPickupPerson(request.getCustomerPickupPerson());
         customer.setCustomerFirstName(request.getCustomerFirstName());
         customer.setCustomerLastName(request.getCustomerLastName());
-        customer.setCustomerPhoneNumber(request.getCustomerPhoneNumber());
-        customer.setCustomerEmail(request.getCustomerEmail());
         customer.getDeviceIntake().add(deviceIntake);
+
         deviceIntake.setCustomer(customer);
         deviceIntake.setUser(user);
-
         deviceIntakeRepository.save(deviceIntake);
+
+        if (request.getCustomerEmail() != null && !request.getCustomerEmail().isBlank()){
+            emailService.warmNotification(customer,siteUrl);
+        }
+
         return DeviceIntakeMapper.deviceIntakeDto(deviceIntake);
 
     }
 
-
-
 }
+
+

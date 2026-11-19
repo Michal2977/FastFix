@@ -1,10 +1,7 @@
-package com.fastfix.entity;
+package com.fastfix.mapper;
 
 import com.fastfix.dto.DeviceIntakeDto;
-import com.fastfix.dto.UserDto;
-import com.fastfix.mapper.CustomerMapper;
-import com.fastfix.mapper.DeviceMapper;
-import com.fastfix.mapper.UserMapper;
+import com.fastfix.entity.DeviceIntake;
 
 import java.util.stream.Collectors;
 

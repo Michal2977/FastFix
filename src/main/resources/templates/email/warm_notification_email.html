@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+    <title>Equipment Received</title>
+</head>
+<body>
+
+   <h2>Your equipment has been received!</h2>
+
+    <p>Hello <strong th:text="${customerFirstName}"></strong>,</p>
+
+   <p>We would like to inform you that your equipment has been successfully registered
+   and accepted by our service center.</p>
+
+    <p>You will receive further notifications at this email address
+     regarding the progress and status of your service request.</p>
+
+     <p>Thank you for choosing our service.</p>
+
+     <p>Best regards,<br>FastFix Team</p>
+
+     <hr>
+
+   <p>This is an automatic notification. Please do not reply to this email.</p>
+</body>
+</html>

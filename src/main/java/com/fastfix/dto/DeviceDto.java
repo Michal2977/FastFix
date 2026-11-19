@@ -15,21 +15,21 @@ public class DeviceDto {
     private String serialNumber;
     private String manuFacture;
     private int amount;
-    private DeviceIntakeDto deviceIntakeDto;
+    private Long deviceIntakeId;
 
 
     public DeviceDto() {
     }
 
     public DeviceDto(Long id, String deviceType, String model, String serialNumber,
-                     String manuFacture, int amount, DeviceIntakeDto deviceIntakeDto) {
+                     String manuFacture, int amount, Long deviceIntakeId) {
         this.id = id;
         this.deviceType = deviceType;
         this.model = model;
         this.serialNumber = serialNumber;
         this.manuFacture = manuFacture;
         this.amount = amount;
-        this.deviceIntakeDto = deviceIntakeDto;
+        this.deviceIntakeId = deviceIntakeId;
     }
 }
 

@@ -70,13 +70,15 @@ function Dashboard(){
     }
          
     const admin = user?.roleDto?.some((role: {role :String}) => role.role === "ADMIN");
+    const manager = user?.roleDto?.some((role : {role : String}) => role.role === "MANAGER");
+    const  receptionist = user?.roleDto?.some((role : {role : String}) => "RECEPTIONIST");
 
 
    return (
     <>
         {loading ? <p>Loading......</p> : user ?  (
             <div>
-            <SideBar logout = {logout} user= {user} admin={admin}/>
+            <SideBar logout = {logout} user= {user} admin={admin} manager={manager} receptionist={receptionist}/>
            
             </div>
         ) : (

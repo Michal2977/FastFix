@@ -15,6 +15,7 @@ public class RegisterAnOrderRequest {
     private String customerLastName;
     private String customerPhoneNumber;
     private String customerEmail;
+    private String customerPickupPerson;
 
 
     public RegisterAnOrderRequest() {

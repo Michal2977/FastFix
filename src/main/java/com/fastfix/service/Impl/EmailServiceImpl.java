@@ -1,5 +1,6 @@
 package com.fastfix.service.Impl;
 
+import com.fastfix.entity.Customer;
 import com.fastfix.entity.User;
 import com.fastfix.service.EmailService;
 import jakarta.mail.MessagingException;
@@ -67,6 +68,25 @@ public class EmailServiceImpl implements EmailService {
         helper.setSubject("Reset Password");
         helper.setText(htmlContent,true);
 
+        javaMailSender.send(message);
+    }
+
+    @Async
+    @Override
+    public void warmNotification(Customer customer, String siteUrl) throws MessagingException{
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message,true);
+
+
+        Context context = new Context();
+        context.setVariable("customerFirstName",customer.getCustomerFirstName());
+
+        String htmlContext = templateEngine.process("email/warm_notification_email.html",context);
+
+        helper.setFrom("mkoszalka0@gmail.com");
+        helper.setTo(customer.getCustomerEmail());
+        helper.setSubject("Equipment Received");
+        helper.setText(htmlContext,true);
         javaMailSender.send(message);
     }
 }
