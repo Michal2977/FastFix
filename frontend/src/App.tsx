@@ -8,6 +8,10 @@ import ResendEmail from "./pages/Resend-Email";
 import ForgotPassword from "./pages/Forgot-Password";
 import ResetPassword from "./pages/Reset-Password";
 import CreateOrder from "./pages/Create-Order";
+import AllOrders from "./pages/All-Orders";
+import AcceptedOrders from "./pages/Accepted-Orders";
+import InProgressOrders from "./pages/In-Progress-Orders";
+import CompletedOrders from "./pages/Completed-Orders";
 
 
 function App() {
@@ -26,6 +30,10 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword/>} />
       <Route path="/reset-password" element={<ResetPassword/>} />
       <Route path="/dashboard/create-order" element={<CreateOrder/>} />
+      <Route path="/dashboard/all-orders" element={<AllOrders/>} />
+      <Route path="/dashboard/accepted-orders" element={<AcceptedOrders/>} />
+      <Route path="/dashboard/in-progress-orders" element={<InProgressOrders/>} />
+      <Route path="/dashboard/completed-orders" element={<CompletedOrders/>} />
      </Routes>
     </BrowserRouter>
     

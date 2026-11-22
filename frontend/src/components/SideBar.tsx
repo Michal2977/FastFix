@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 
 
-function SideBar({logout,user,admin,manager,receptionist} : any){
+function SideBar({logout,user,admin,manager,receptionist,technican,countAcceptedOrders,
+  countInProgressOrders,countCompletedOrders,countAllOrders} : any){
     return(
          <div className="d-flex">
   <nav className="bg-dark text-white vh-100 p-3" style={{ width: "250px" }}>
@@ -14,12 +15,23 @@ function SideBar({logout,user,admin,manager,receptionist} : any){
         aria-expanded="false" aria-label="Toggle navigation">
         <span className="navbar-toggler-icon"></span>
       </button>
-
       <div className="collapse navbar-collapse show w-100" id="navbarSupportedContent">
         <ul className="nav flex-column w-100">
           <li className="nav-item">
             <Link to={"/account-information"}>Account Information</Link>
           </li>
+          {user && (admin || receptionist || manager || technican) && (
+            <div>
+              <Link to={"/dashboard/all-orders"}>All Orders: {countAllOrders}</Link>
+              <br/>
+              <Link to={"/dashboard/accepted-orders"}>Accepted Orders:<span>{countAcceptedOrders}</span></Link>
+              <br/>
+              <Link to={"/dashboard/in-progress-orders"}>In Progress Orders:{countInProgressOrders} </Link>
+              <br/>
+              <Link to={"/dashboard/completed-orders"}>Completed Orders: {countCompletedOrders}</Link>
+            
+            </div>
+          )}
           {user && (admin || receptionist || manager) && (
             <div>
             

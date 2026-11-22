@@ -1,6 +1,8 @@
 package com.fastfix.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,15 +21,23 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(name = "first_name",nullable = false)
+    @Size(min = 2, max = 50)
     private String firstName;
 
+    @NotBlank
     @Column(name = "last_name",nullable = false)
+    @Size(min = 2, max = 50)
     private String lastName;
 
+    @NotBlank
+    @Size(max = 254)
     @Column(name = "email",nullable = false,unique = true)
     private String email;
 
+    @NotBlank
+    @Size(min = 8, max = 72)
     @Column(name = "password",nullable = false)
     private String password;
 

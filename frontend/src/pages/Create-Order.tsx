@@ -11,9 +11,11 @@ function CreateOrder () {
            customerFirstName : "", customerLastName: "" , customerPhoneNumber :  ""
             , customerEmail : "", customerPickupPerson : "", 
             devices : [{
-                deviceType : "", model : "" ,serialNumber: "", amount: 1, manufacturer : ""
+                deviceType : "", model : "" ,serialNumber: "", amount: 1, manufacturer : "", problemDescription : "",
+                deviceCondition : "" , accessories : ""
             }]
         })
+
         const [createOrder,setCreateOrder] = useState<any>(inicialOrder());
         const [successMessage,setSuccessMessage] = useState("");
         const [failedMessage,setFailedMessage] = useState("");
@@ -81,18 +83,23 @@ function CreateOrder () {
                 )}
                 <h1>Customer Information</h1>
                 <input type="text" placeholder="customer First Name" value={createOrder.customerFirstName} required
+                minLength={2} maxLength={30}
                 onChange={(e) => setCreateOrder({...createOrder,customerFirstName : e.target.value})}/>
                 <br/>
                 <input type="text" placeholder="customer Last Name" value={createOrder.customerLastName}
+                 maxLength={30}
                 onChange={(e) => setCreateOrder({...createOrder,customerLastName : e.target.value})}/>
                 <br/>
                 <PhoneInput defaultCountry="PL" value={createOrder.customerPhoneNumber}  placeholder="Enter Phone Number"
+                 maxLength={20}
                 onChange={(e) => setCreateOrder({...createOrder,customerPhoneNumber : e ?? ""})}/>
                 <br/>
                 <input type="email" placeholder="customer email" value={createOrder.customerEmail}
+                 maxLength={100}
                 onChange={(e) => setCreateOrder({...createOrder,customerEmail : e.target.value})}/>
                 <br/>
                 <input type="text" placeholder="customer  Pickup Person" value={createOrder.customerPickupPerson}
+                 maxLength={30}
                 onChange={(e) => setCreateOrder({...createOrder,customerPickupPerson : e.target.value})}/>
                 <br/>
                 <h1>Device Information</h1>
@@ -100,28 +107,28 @@ function CreateOrder () {
                     <div key={index}>
                         <h1>Device : {index + 1}</h1>
 
-                <input type="text" placeholder="device Type" value={device.deviceType} required
+                <input type="text" placeholder="device Type" value={device.deviceType} required maxLength={50}
                 onChange={(e) => {
                     const updateDevices = [...createOrder.devices];
                     updateDevices[index] = {...updateDevices[index],deviceType : e.target.value};
                     setCreateOrder({...createOrder,devices : updateDevices});
                 }} />
                 <br/>
-                 <input type="text" placeholder="device model" value={device.model} 
+                 <input type="text" placeholder="device model" value={device.model}  maxLength={50}
                 onChange={(e) => {
                     const updateDevices = [...createOrder.devices];
                     updateDevices[index] = {...updateDevices[index],model : e.target.value};
                     setCreateOrder({...createOrder,devices : updateDevices});
                 }} />
                 <br/>
-                <input type="text" placeholder="device serialNumber" value={device.serialNumber} 
+                <input type="text" placeholder="device serialNumber" value={device.serialNumber}  maxLength={50}
                 onChange={(e) => {
                     const updateDevices = [...createOrder.devices];
                     updateDevices[index] = {...updateDevices[index],serialNumber : e.target.value};
                     setCreateOrder({...createOrder,devices : updateDevices});
                 }} />
                 <br/>
-                <input type="text" placeholder="device manufacturer" value={device.manufacturer} 
+                <input type="text" placeholder="device manufacturer" value={device.manufacturer}  maxLength={50}
                 onChange={(e) => {
                     const updateDevices = [...createOrder.devices];
                     updateDevices[index] = {...updateDevices[index],manufacturer : e.target.value};
@@ -135,6 +142,29 @@ function CreateOrder () {
                     updateDevices[index] = {...updateDevices[index],amount : Number(e.target.value)};
                     setCreateOrder({...createOrder,devices : updateDevices});
                 }} />
+                 <br/>
+                <textarea placeholder="problem description" value={device.problemDescription} required 
+                minLength={20} maxLength={1000}
+                onChange={(e) => {
+                    const updateDevices = [...createOrder.devices];
+                    updateDevices[index] = {...updateDevices[index],problemDescription : e.target.value};
+                    setCreateOrder({...createOrder,devices : updateDevices});
+                }}/>
+                 <br/>
+                <input type="text" placeholder="device condiction" value={device.deviceCondition} required
+                minLength={10} maxLength={150}
+                onChange={(e) => {
+                    const updateDevices = [...createOrder.devices];
+                    updateDevices[index] = {...updateDevices[index],deviceCondition : e.target.value};
+                    setCreateOrder({...createOrder,devices : updateDevices});
+                }} />
+                 <br/>
+                <input type="text" placeholder="device accessories" value={device.accessories}  maxLength={200}
+                onChange={(e) => {
+                    const updateDevices = [...createOrder.devices];
+                    updateDevices[index] = {...updateDevices[index],accessories : e.target.value};
+                    setCreateOrder({...createOrder,devices : updateDevices});
+                }} />
                     </div>
                 ))}
             </div>
@@ -146,3 +176,4 @@ function CreateOrder () {
 }
 
 export default CreateOrder;
+

@@ -8,6 +8,11 @@ function Dashboard(){
      const [user, setUser] = useState<any>(null);
     const navigate = useNavigate();
     const [inncorectMessage,setIncorrectMessage] = useState("");
+    const [countAcceptedOrders,setCountAcceptedOrders] = useState(0);
+    const [countInProgressOrders,setCountInProgressOrders] = useState(0);
+    const [countCompletedOrders,setCountCompletedOrders] = useState(0);
+    const [countAllOrders,setCountAllOrders] = useState(0);
+
     const [correctMessage,setCorrectMessage] = useState("");
     const [loading ,setLoading] = useState(true);
 
@@ -26,6 +31,23 @@ function Dashboard(){
 
             const data = await response.json();
             setUser(data);
+
+            const [allResponse,acceptedResponse,inProgressResponse,completedResponse]= await Promise.all([
+                fetch(`${API_URL}/api/count-all`,{credentials : "include"}),
+                fetch(`${API_URL}/api/count-accepted`,{credentials: "include"}),
+                fetch(`${API_URL}/api/count-in-progress`,{credentials: "include"}),
+                fetch(`${API_URL}/api/count-completed`,{credentials: "include"}),
+            ])
+           const all = await allResponse.json();
+           const accepted = await acceptedResponse.json();
+           const inProgress = await inProgressResponse.json();
+           const completed = await completedResponse.json();
+           
+           setCountAllOrders(all);
+           setCountAcceptedOrders(accepted);
+           setCountInProgressOrders(inProgress);
+           setCountCompletedOrders(completed);
+
         }catch(error){
             console.log(error);
         }finally{
@@ -33,6 +55,7 @@ function Dashboard(){
         }
     };
        getUser();
+
     },[navigate])
 
 
@@ -72,13 +95,15 @@ function Dashboard(){
     const admin = user?.roleDto?.some((role: {role :String}) => role.role === "ADMIN");
     const manager = user?.roleDto?.some((role : {role : String}) => role.role === "MANAGER");
     const  receptionist = user?.roleDto?.some((role : {role : String}) => "RECEPTIONIST");
+    const technican = user?.roleDto?.some((role :{role : String}) => "TECHNICAN");
 
 
    return (
     <>
         {loading ? <p>Loading......</p> : user ?  (
             <div>
-            <SideBar logout = {logout} user= {user} admin={admin} manager={manager} receptionist={receptionist}/>
+            <SideBar logout = {logout} user= {user} admin={admin} manager={manager} receptionist={receptionist} technican={technican} countAcceptedOrders={countAcceptedOrders} countInProgressOrders={countInProgressOrders}
+             countCompletedOrders={countCompletedOrders} countAllOrders={countAllOrders}/>
            
             </div>
         ) : (

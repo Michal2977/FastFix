@@ -56,6 +56,10 @@ public class SecurityConfiguration {
                                 ,"/api/auth/verify","/api/auth/resend","/api/auth/forgot-password","/api/auth/reset-password")
                                 .permitAll().
                         requestMatchers("/api/create-order").hasAnyRole("ADMIN","RECEPTIONIST","MANAGER").
+                        requestMatchers("/api/all-orders","/api/accepted-orders","/api/in-progress-orders"
+                        , "/api/completed-orders","/api/count-accepted","/api/count-in-progress","/api/count-completed",
+                                "/api/count-all").
+                                hasAnyRole("ADMIN","RECEPTIONIST","MANAGER","TECHNICIAN").
                         requestMatchers("/api/auth/create-employee").hasRole("ADMIN").
                         requestMatchers("/api/auth/account-information","/api/auth/account-information/update")
                        .hasAnyRole("ADMIN","MANAGER","TECHNICIAN","RECEPTIONIST").anyRequest().authenticated())

@@ -94,10 +94,10 @@ function CreateEmplyee(){
             )}
             <form onSubmit={createEmployee}>
                
-          <input type="text" placeholder="first name" value={newEmployee.firstName} required
+          <input type="text" placeholder="first name" value={newEmployee.firstName} required minLength={2} maxLength={50}
           onChange={(e) => setNewEmployee({...newEmployee,firstName : e.target.value})}/>
           <br/>
-          <input type="text" placeholder="last name" value={newEmployee.lastName} required
+          <input type="text" placeholder="last name" value={newEmployee.lastName} required  minLength={2} maxLength={50}
            onChange={(e) => setNewEmployee({...newEmployee,lastName : e.target.value})}/>
           <br/>
 
@@ -114,10 +114,10 @@ function CreateEmplyee(){
              </div>
           <br/>
 
-          <input type="email" placeholder="email" value={newEmployee.email} required
+          <input type="email" placeholder="email" value={newEmployee.email} required maxLength={254}
           onChange={(e) => setNewEmployee({...newEmployee,email : e.target.value})}/>
           <br/>
-          <input type="password" placeholder="password" value={newEmployee.password} required
+          <input type="password" placeholder="password" value={newEmployee.password} required minLength={8} maxLength={72}
           onChange={(e) => setNewEmployee({...newEmployee,password : e.target.value})}/>
 
           <br/>

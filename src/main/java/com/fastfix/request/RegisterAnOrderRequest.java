@@ -1,6 +1,7 @@
 package com.fastfix.request;
 
 
+import jakarta.persistence.Column;
 import lombok.Getter;
 
 @Getter
@@ -16,6 +17,9 @@ public class RegisterAnOrderRequest {
     private String customerPhoneNumber;
     private String customerEmail;
     private String customerPickupPerson;
+    private String problemDescription;
+    private String deviceCondition;
+    private String accessories;
 
 
     public RegisterAnOrderRequest() {

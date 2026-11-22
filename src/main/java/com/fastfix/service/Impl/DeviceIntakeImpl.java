@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -50,6 +51,9 @@ public class DeviceIntakeImpl implements DeviceIntakeService {
         device.setManufacturer(request.getManufacturer());
         device.setAmount(request.getAmount());
         device.setDeviceIntake(deviceIntake);
+        device.setProblemDescription(request.getProblemDescription());
+        device.setDeviceCondition(request.getDeviceCondition());
+        device.setAccessories(request.getAccessories());
 
         deviceIntake.getDevice().add(device);
 
@@ -71,6 +75,57 @@ public class DeviceIntakeImpl implements DeviceIntakeService {
 
         return DeviceIntakeMapper.deviceIntakeDto(deviceIntake);
 
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','RECEPTIONIST','TECHNICIAN')")
+    public List<DeviceIntakeDto>  findAllIntakeOrders(){
+        List<DeviceIntake> deviceIntakes = deviceIntakeRepository.findAllWithDevice();
+        return deviceIntakes.stream().map(DeviceIntakeMapper :: deviceIntakeDto).toList();
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','RECEPTIONIST','TECHNICIAN')")
+    public List<DeviceIntakeDto> findAllAcceptedOrders(){
+     List<DeviceIntake> deviceIntakesAccepted = deviceIntakeRepository.findAllDeviceIntakeAccepted();
+     return deviceIntakesAccepted.stream().map(DeviceIntakeMapper :: deviceIntakeDto).toList();
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','RECEPTIONIST','TECHNICIAN')")
+    public List<DeviceIntakeDto> findAllInProgressOrders() {
+        List<DeviceIntake> deviceIntakes = deviceIntakeRepository.findAllDeviceIntakeInProgress();
+        return deviceIntakes.stream().map(DeviceIntakeMapper :: deviceIntakeDto).toList();
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER','RECEPTIONIST','TECHNICIAN')")
+    public List<DeviceIntakeDto> findAllCompletedOrders() {
+        List<DeviceIntake> deviceIntakes = deviceIntakeRepository.findAllDeviceIntakeCompleted();
+        return deviceIntakes.stream().map(DeviceIntakeMapper :: deviceIntakeDto).toList();
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public long countAllAcceptedOrders(){
+        return deviceIntakeRepository.countAcceptedOrders();
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public long countAllInProgressOrders() {
+        return deviceIntakeRepository.countInProgressOrders();
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public long countAllCompletedOrders() {
+        return deviceIntakeRepository.countCompletedOrders();
+    }
+
+    @Override
+    public long countAllOrders() {
+        return deviceIntakeRepository.countAllOrders();
     }
 
 }
