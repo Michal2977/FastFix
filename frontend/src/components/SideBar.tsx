@@ -32,6 +32,11 @@ function SideBar({logout,user,admin,manager,receptionist,technican,countAccepted
             
             </div>
           )}
+          {user && (admin || manager) && (
+            <div>
+              <Link to={"/dashboard/add-material"}>Add new Material</Link>
+            </div>
+          )}
           {user && (admin || receptionist || manager) && (
             <div>
             

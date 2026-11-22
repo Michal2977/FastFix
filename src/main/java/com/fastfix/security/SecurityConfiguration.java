@@ -56,6 +56,7 @@ public class SecurityConfiguration {
                                 ,"/api/auth/verify","/api/auth/resend","/api/auth/forgot-password","/api/auth/reset-password")
                                 .permitAll().
                         requestMatchers("/api/create-order").hasAnyRole("ADMIN","RECEPTIONIST","MANAGER").
+                        requestMatchers("/api/add-material").hasAnyRole("ADMIN","MANAGER").
                         requestMatchers("/api/all-orders","/api/accepted-orders","/api/in-progress-orders"
                         , "/api/completed-orders","/api/count-accepted","/api/count-in-progress","/api/count-completed",
                                 "/api/count-all").

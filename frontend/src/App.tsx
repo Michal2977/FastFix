@@ -12,6 +12,7 @@ import AllOrders from "./pages/All-Orders";
 import AcceptedOrders from "./pages/Accepted-Orders";
 import InProgressOrders from "./pages/In-Progress-Orders";
 import CompletedOrders from "./pages/Completed-Orders";
+import AddMaterial from "./pages/Add-Material";
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
       <Route path="/dashboard/accepted-orders" element={<AcceptedOrders/>} />
       <Route path="/dashboard/in-progress-orders" element={<InProgressOrders/>} />
       <Route path="/dashboard/completed-orders" element={<CompletedOrders/>} />
+      <Route path="/dashboard/add-material" element={<AddMaterial/>} />
      </Routes>
     </BrowserRouter>
     
