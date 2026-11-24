@@ -7,10 +7,7 @@ import com.fastfix.service.Impl.MaterialsServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -35,5 +32,15 @@ public class MaterialsController {
         catch (Exception e){
             return ResponseEntity.internalServerError().body(new ApiResponse("Something Went Wrong Try Again Later"));
         }
+    }
+
+    @GetMapping("/all-materials")
+    public ResponseEntity<?> findAllMaterials(){
+        return ResponseEntity.ok().body(materialsService.findAllMaterials());
+    }
+
+    @GetMapping("/count-materials")
+    public ResponseEntity<Long> countAllMaterials(){
+        return ResponseEntity.ok().body(materialsService.countAllMaterials());
     }
 }

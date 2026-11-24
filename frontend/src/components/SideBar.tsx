@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 
 function SideBar({logout,user,admin,manager,receptionist,technican,countAcceptedOrders,
-  countInProgressOrders,countCompletedOrders,countAllOrders} : any){
+  countInProgressOrders,countCompletedOrders,countAllOrders,countAllMaterials} : any){
     return(
          <div className="d-flex">
   <nav className="bg-dark text-white vh-100 p-3" style={{ width: "250px" }}>
@@ -29,6 +29,8 @@ function SideBar({logout,user,admin,manager,receptionist,technican,countAccepted
               <Link to={"/dashboard/in-progress-orders"}>In Progress Orders:{countInProgressOrders} </Link>
               <br/>
               <Link to={"/dashboard/completed-orders"}>Completed Orders: {countCompletedOrders}</Link>
+              <br/>
+              <Link to={"/dashboard/all-materials"}>All materials: {countAllMaterials}</Link>
             
             </div>
           )}

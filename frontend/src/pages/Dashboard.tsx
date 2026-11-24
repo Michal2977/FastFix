@@ -12,6 +12,7 @@ function Dashboard(){
     const [countInProgressOrders,setCountInProgressOrders] = useState(0);
     const [countCompletedOrders,setCountCompletedOrders] = useState(0);
     const [countAllOrders,setCountAllOrders] = useState(0);
+    const [countAllMaterials,setCountAllMaterials] = useState(0);
 
     const [correctMessage,setCorrectMessage] = useState("");
     const [loading ,setLoading] = useState(true);
@@ -32,21 +33,24 @@ function Dashboard(){
             const data = await response.json();
             setUser(data);
 
-            const [allResponse,acceptedResponse,inProgressResponse,completedResponse]= await Promise.all([
+            const [allResponse,acceptedResponse,inProgressResponse,completedResponse,materialsResponse]= await Promise.all([
                 fetch(`${API_URL}/api/count-all`,{credentials : "include"}),
                 fetch(`${API_URL}/api/count-accepted`,{credentials: "include"}),
                 fetch(`${API_URL}/api/count-in-progress`,{credentials: "include"}),
                 fetch(`${API_URL}/api/count-completed`,{credentials: "include"}),
+                fetch(`${API_URL}/api/count-materials`,{credentials  : "include"})
             ])
            const all = await allResponse.json();
            const accepted = await acceptedResponse.json();
            const inProgress = await inProgressResponse.json();
            const completed = await completedResponse.json();
+           const materials = await materialsResponse.json();
            
            setCountAllOrders(all);
            setCountAcceptedOrders(accepted);
            setCountInProgressOrders(inProgress);
            setCountCompletedOrders(completed);
+           setCountAllMaterials(materials);
 
         }catch(error){
             console.log(error);
@@ -103,7 +107,7 @@ function Dashboard(){
         {loading ? <p>Loading......</p> : user ?  (
             <div>
             <SideBar logout = {logout} user= {user} admin={admin} manager={manager} receptionist={receptionist} technican={technican} countAcceptedOrders={countAcceptedOrders} countInProgressOrders={countInProgressOrders}
-             countCompletedOrders={countCompletedOrders} countAllOrders={countAllOrders}/>
+             countCompletedOrders={countCompletedOrders} countAllOrders={countAllOrders} countAllMaterials={countAllMaterials}/>
            
             </div>
         ) : (

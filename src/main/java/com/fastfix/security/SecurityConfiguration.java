@@ -59,7 +59,7 @@ public class SecurityConfiguration {
                         requestMatchers("/api/add-material").hasAnyRole("ADMIN","MANAGER").
                         requestMatchers("/api/all-orders","/api/accepted-orders","/api/in-progress-orders"
                         , "/api/completed-orders","/api/count-accepted","/api/count-in-progress","/api/count-completed",
-                                "/api/count-all").
+                                "/api/count-all","/api/all-materials","/api/count-materials").
                                 hasAnyRole("ADMIN","RECEPTIONIST","MANAGER","TECHNICIAN").
                         requestMatchers("/api/auth/create-employee").hasRole("ADMIN").
                         requestMatchers("/api/auth/account-information","/api/auth/account-information/update")

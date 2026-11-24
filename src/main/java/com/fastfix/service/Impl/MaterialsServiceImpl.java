@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -68,4 +69,17 @@ public class MaterialsServiceImpl implements MaterialsService {
         materialsRepository.save(materials);
         return MaterialMapper.materialsDto(materials);
     }
+
+
+    @Override
+    public  long countAllMaterials(){
+        return materialsRepository.countAllMaterials();
+    }
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER' ,'TECHNICIAN','RECEPTIONIST')")
+    @Override
+    public List<MaterialsDto> findAllMaterials(){
+        List<Materials> materials = materialsRepository.findAll();
+        return materials.stream().map(MaterialMapper :: materialsDto).toList();
+    }
+
 }
